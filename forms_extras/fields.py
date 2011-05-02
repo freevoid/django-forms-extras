@@ -6,10 +6,12 @@ from forms_extras.declarative import DeclarativeMultiWidget,\
 
 from forms_extras.widgets import DatePeriodSelectInput, Period
 
+
 class NoneBooleanField(forms.BooleanField):
     def to_python(self, value):
         original = super(NoneBooleanField, self).to_python(value)
         return original if original else None
+
 
 class DatePeriodSelectField(forms.MultiValueField):
     '''
@@ -22,7 +24,7 @@ class DatePeriodSelectField(forms.MultiValueField):
         super(DatePeriodSelectField, self).__init__(
                 (forms.ChoiceField(
                     choices=Period.CHOICES + [('select', _('Select period...'))]),
-                    forms.DateField(), forms.DateField()), 
+                    forms.DateField(), forms.DateField()),
                 *args, **kwargs)
 
     def compress(self, data_list):
@@ -35,10 +37,12 @@ class DatePeriodSelectField(forms.MultiValueField):
         else:
             return None
 
+
 class DatePeriodWidget(DeclarativeMultiWidget):
     def format_output(self, widget_list):
         return _('from %(from_date)s to %(to_date)s') % {'from_date': widget_list[0],
             'to_date': widget_list[1]}
+
 
 class DatePeriodField(DeclarativeMultiValueField):
     widget_class = DatePeriodWidget
@@ -51,4 +55,3 @@ class DatePeriodField(DeclarativeMultiValueField):
         (forms.DateField, {}),
         (forms.DateField, {})
         )
-

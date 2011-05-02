@@ -4,9 +4,10 @@ from calendar import monthrange
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
+
 class Period:
     """Time periods used in filtering forms"""
-    
+
     CHOICES = [
         ('today', _('Today')),
         ('yesterday', _('Yesterday')),
@@ -15,9 +16,9 @@ class Period:
         ('thismonth', _('This month')),
         ('lastmonth', _('Last month')),
     ]
-    
+
     class InvalidCode(Exception): pass
-    
+
     @classmethod
     def get_span(cls, choice_code):
         """Get earliest and latest time boundaries corresponding to supplied code"""
@@ -66,6 +67,7 @@ class Period:
             )
         raise cls.InvalidCode('can\'t generate time span: invalid choice_code = %s' % choice_code)
 
+
 class DatePeriodSelectInput(forms.MultiWidget):
     '''
     Widget for DatePeriodSelectField
@@ -97,5 +99,3 @@ class DatePeriodSelectInput(forms.MultiWidget):
     def format_output(self, widget_list):
         return u'%s<div class="detailed_period"><br />%s %s<br />%s %s</div>' % (
                 widget_list[0], _('from'), widget_list[1], _('to'), widget_list[2])
-
-
