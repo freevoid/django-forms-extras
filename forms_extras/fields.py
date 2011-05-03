@@ -1,41 +1,31 @@
+import re
+
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from forms_extras.declarative import DeclarativeMultiWidget,\
     DeclarativeMultiValueField
 
-from forms_extras.widgets import DatePeriodSelectInput, Period
+
+class CommaSeparatedCharField(forms.CharField):
+
+    SEPARATORS_RE = re.compile(r'[,;\s]+')
+
+    def clean(self, value):
+
+        value = super(CommaSeparatedCharField, self).clean(value)
+
+        if value:
+            return filter(None, self.SEPARATORS_RE.split(value))
+        else:
+            return []
 
 
 class NoneBooleanField(forms.BooleanField):
+
     def to_python(self, value):
         original = super(NoneBooleanField, self).to_python(value)
         return original if original else None
-
-
-class DatePeriodSelectField(forms.MultiValueField):
-    '''
-    Form field for a date period with predefined choices
-    (today, month ago, etc).
-    '''
-    widget = DatePeriodSelectInput
-
-    def __init__(self, *args, **kwargs):
-        super(DatePeriodSelectField, self).__init__(
-                (forms.ChoiceField(
-                    choices=Period.CHOICES + [('select', _('Select period...'))]),
-                    forms.DateField(), forms.DateField()),
-                *args, **kwargs)
-
-    def compress(self, data_list):
-        if data_list:
-            type = data_list[0]
-            if type == 'select':
-                return data_list[1], data_list[2]
-            else:
-                return Period.get_span(type)
-        else:
-            return None
 
 
 class DatePeriodWidget(DeclarativeMultiWidget):
