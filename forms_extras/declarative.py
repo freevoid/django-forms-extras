@@ -1,3 +1,15 @@
+import itertools
+
+from django import forms
+from django.utils.datastructures import SortedDict
+
+
+def expand_initials(initial_dict):
+    for k, v in initial_dict.iteritems():
+        if callable(v):
+            initial_dict[k] = v()
+    return initial_dict
+
 
 class DeclarativeMultiWidget(forms.MultiWidget):
     def __init__(self, widgets_template, required=False, *args, **kwargs):
@@ -50,7 +62,7 @@ class DeclarativeMultiValueField(forms.MultiValueField):
         self.widget = self.widget_class(self.widgets_template, required=self.required)
         kwargs['label'] = kwargs.get('label') or getattr(self, 'label', None)
         initial = expand_initials(kwargs.pop('initial', {}))
-        
+
         def field_generator():
             for name, (klass, field_kwargs) in self.field_mapping.iteritems():
                 if not field_kwargs.has_key('initial') and initial.has_key(name):
@@ -60,13 +72,6 @@ class DeclarativeMultiValueField(forms.MultiValueField):
         fields = list(field_generator())
 
         super(DeclarativeMultiValueField, self).__init__(fields, *args, **kwargs)
-
-    def get_requisite(self):
-        try:
-            requisites = self.clean()
-            return json.dumps(requisites)
-        except forms.ValidationError:
-            return None
 
     def clean(self, value):
         return super(DeclarativeMultiValueField, self).clean(value)
