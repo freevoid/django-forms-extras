@@ -6,6 +6,10 @@ setup(
     name='forms_extras',
     version='0.1.1',
     packages=find_packages('.'),
+    package_data = {'': [
+        'locale/*/LC_MESSAGES/django.po',
+        'locale/*/LC_MESSAGES/django.mo',
+    ]},
 
     # Metadata
     author='Nikolay Zakharov',
